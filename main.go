@@ -1,8 +1,8 @@
 package main
 
 import (
-	"restarShopGo/api"
-	"restarShopGo/product"
+	"./api"
+	"./product"
 )
 
 func main() {

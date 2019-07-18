@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"restarShopGo/product"
+
+	"../product"
 
 	"github.com/go-chi/chi"
 	jsoniter "github.com/json-iterator/go"
 )
 
-var Json = jsoniter.ConfigCompatibleWithStandardLibrary
+// JSON s
+var JSON = jsoniter.ConfigCompatibleWithStandardLibrary
 
 const localhost = "localhost:8080"
 
+// Listen открываем порт на сервере
 func Listen(c *product.Config) {
 	r := chi.NewRouter()
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +40,7 @@ func Listen(c *product.Config) {
 
 		sliceProducts := returnProductsByID(c, sliceIDS)
 
-		data, _ := Json.Marshal(sliceProducts)
+		data, _ := JSON.Marshal(sliceProducts)
 		w.Write(data)
 
 		fmt.Println(searchString)
@@ -62,6 +65,7 @@ func Listen(c *product.Config) {
 	fmt.Println("done")
 }
 
+// SearchID поиск по базе
 func SearchID(c *product.Config, s string) []string {
 	var sKeys []string
 
