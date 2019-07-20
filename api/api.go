@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"../product"
 	s "../search"
 
 	"github.com/go-chi/chi"
@@ -18,7 +17,7 @@ var JSON = jsoniter.ConfigCompatibleWithStandardLibrary
 const localhost = "localhost:8080"
 
 // Listen открываем порт на сервере
-func Listen(c *product.Config) {
+func Listen() {
 	r := chi.NewRouter()
 	search := s.InitSearch()
 

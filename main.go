@@ -5,6 +5,5 @@ import (
 )
 
 func main() {
-	// c := product.ReadProducts("data/data.json")
-	api.Listen(c)
+	api.Listen()
 }

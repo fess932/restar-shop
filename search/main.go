@@ -3,9 +3,11 @@ package search
 // Import package
 import (
 	"fmt"
-	"math/rand"
+	"io/ioutil"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/restream/reindexer"
+
 	// choose how the Reindexer binds to the app (in this case "builtin," which means link Reindexer as a static library)
 	_ "github.com/restream/reindexer/bindings/builtin"
 	// OR link Reindexer as static library with bundled server.
@@ -13,58 +15,36 @@ import (
 	// "github.com/restream/reindexer/bindings/builtinserver/config"
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 // Item Define struct with reindex tags
 type Item struct {
-	ID       int64  `json:"id" reindex:"id,,pk"`           // 'id' is primary key
-	Name     string `json:"name" reindex:"name,fuzzytext"` // add index by 'name' field
-	Articles []int  `json:"articles" reindex:"articles"`   // add index by articles 'articles' array
-	Year     int    `json:"year" reindex:"year,tree"`      // add sortable index by 'year' field
+	ID   string `json:"id" reindex:"id,,pk"`           // 'id' is primary key
+	Name string `json:"name" reindex:"name,fuzzytext"` // add index by 'name' field
+	SKU  string `json:"sku" reindex:"sku,fuzzytext"`   // add sortable index by 'year' field
 }
 
 // Shop is shop
 type Shop struct {
-	Items []Item
+	Items []Item `json:"items"`
 	db    *reindexer.Reindexer
 }
 
-func (shop *Shop) createIndex(db *reindexer.Reindexer) {
+func (shop *Shop) createIndex() {
+
+	file, _ := ioutil.ReadFile("../data/data.json")
+	json.Unmarshal(file, shop.Items)
 	// Generate dataset
-	for i := 0; i < 10; i++ {
-		err := db.Upsert("items", &Item{
-			ID:       int64(i),
-			Name:     "Вася cs 1050",
-			Articles: []int{rand.Int() % 100, rand.Int() % 100},
-			Year:     2000 + rand.Int()%50,
+	for _, v := range shop.Items {
+		err := shop.db.Upsert("items", &Item{
+			ID:   v.ID,
+			Name: v.Name,
+			SKU:  v.SKU,
 		})
 		if err != nil {
 			panic(err)
 		}
 	}
-
-	for i := 10; i < 20; i++ {
-		err := db.Upsert("items", &Item{
-			ID:       int64(i),
-			Name:     "Петя cs.1050",
-			Articles: []int{rand.Int() % 100, rand.Int() % 100},
-			Year:     2000 + rand.Int()%50,
-		})
-		if err != nil {
-			panic(err)
-		}
-
-		for i := 20; i < 30; i++ {
-			err := db.Upsert("items", &Item{
-				ID:       int64(i),
-				Name:     "Вова cs1050",
-				Articles: []int{rand.Int() % 100, rand.Int() % 100},
-				Year:     2000 + rand.Int()%50,
-			})
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-
 }
 
 // Search searching items and get array of items if exist
@@ -102,6 +82,7 @@ func InitSearch() *Shop {
 	shop := Shop{}
 	shop.db = reindexer.NewReindex("cproto://127.0.0.1:6534/testdb")
 	shop.db.OpenNamespace("items", reindexer.DefaultNamespaceOptions(), Item{})
+	shop.createIndex()
 
 	return &shop
 }
