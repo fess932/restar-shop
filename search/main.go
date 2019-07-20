@@ -1,4 +1,4 @@
-package main
+package search
 
 // Import package
 import (
@@ -27,8 +27,7 @@ type Shop struct {
 	db    *reindexer.Reindexer
 }
 
-func createIn(db *reindexer.Reindexer) {
-
+func (shop *Shop) createIndex(db *reindexer.Reindexer) {
 	// Generate dataset
 	for i := 0; i < 10; i++ {
 		err := db.Upsert("items", &Item{
@@ -68,15 +67,6 @@ func createIn(db *reindexer.Reindexer) {
 
 }
 
-// InitSearch get instance of search
-func InitSearch() *Shop {
-	shop := Shop{}
-	shop.db = reindexer.NewReindex("cproto://127.0.0.1:6534/testdb")
-	shop.db.OpenNamespace("items", reindexer.DefaultNamespaceOptions(), Item{})
-
-	return &shop
-}
-
 // Search searching items and get array of items if exist
 func (shop *Shop) Search(qs string) []Item {
 	items := []Item{}
@@ -105,4 +95,13 @@ func (shop *Shop) Search(qs string) []Item {
 
 	return items
 
+}
+
+// InitSearch get instance of search
+func InitSearch() *Shop {
+	shop := Shop{}
+	shop.db = reindexer.NewReindex("cproto://127.0.0.1:6534/testdb")
+	shop.db.OpenNamespace("items", reindexer.DefaultNamespaceOptions(), Item{})
+
+	return &shop
 }

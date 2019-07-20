@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"../product"
+	s "../search"
 
 	"github.com/go-chi/chi"
 	jsoniter "github.com/json-iterator/go"
@@ -19,6 +20,8 @@ const localhost = "localhost:8080"
 // Listen открываем порт на сервере
 func Listen(c *product.Config) {
 	r := chi.NewRouter()
+	search := s.InitSearch()
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("root"))
 		if err != nil {
@@ -28,20 +31,12 @@ func Listen(c *product.Config) {
 
 	r.Get("/search/{searchString}", func(w http.ResponseWriter, r *http.Request) {
 		searchString := chi.URLParam(r, "searchString")
-		sliceIDS := SearchID(c, searchString)
 
-		if len(sliceIDS) == 0 {
-			_, err := w.Write([]byte("Ничего не найдено"))
-			if err != nil {
-				fmt.Println(err)
-			}
-			return
-		}
+		items := search.Search(searchString)
 
-		sliceProducts := returnProductsByID(c, sliceIDS)
+		itemsMarshal, _ := JSON.Marshal(items)
 
-		data, _ := JSON.Marshal(sliceProducts)
-		w.Write(data)
+		w.Write(itemsMarshal)
 
 		fmt.Println(searchString)
 	})
@@ -51,7 +46,15 @@ func Listen(c *product.Config) {
 	fmt.Println("api listen at", localhost)
 
 	// ? scanning in terminal
+
+	scancode()
+
+	fmt.Println("done")
+}
+
+func scancode() {
 	scancode := ""
+	println(`input "stop" to stop`)
 	for {
 		if scancode == "stop" {
 			break
@@ -62,33 +65,4 @@ func Listen(c *product.Config) {
 		}
 	}
 
-	fmt.Println("done")
-}
-
-// SearchID поиск по базе
-func SearchID(c *product.Config, s string) []string {
-	var sKeys []string
-
-	if val := searchSKU(c, s); val != "" {
-		for _, v := range c.SKU[val] {
-			sKeys = append(sKeys, v)
-		}
-	}
-
-	return sKeys
-}
-
-func searchSKU(c *product.Config, s string) string {
-	if val, ok := c.Products[s]; ok {
-		return val.SKU
-	}
-	return ""
-}
-
-func returnProductsByID(c *product.Config, IDS []string) []product.Product {
-	var ps []product.Product
-	for _, v := range IDS {
-		ps = append(ps, c.Products[v])
-	}
-	return ps
 }
