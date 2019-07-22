@@ -1,5 +1,7 @@
 # reindexer
 
+// установить модуль reindexer
+
 // запустить докер с сервером reindexer
 docker run -p9088:9088 -p6534:6534 -it reindexer/reindexer
 
