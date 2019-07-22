@@ -6,15 +6,15 @@ import (
 	"io/ioutil"
 	"log"
 
-	"../db"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/restream/reindexer"
 
 	// choose how the Reindexer binds to the app (in this case "builtin," which means link Reindexer as a static library)
-	_ "github.com/restream/reindexer/bindings/builtin"
+	//_ "github.com/restream/reindexer/bindings/builtin"
 	// OR link Reindexer as static library with bundled server.
 	// _ "github.com/restream/reindexer/bindings/builtinserver"
 	// "github.com/restream/reindexer/bindings/builtinserver/config"
+	"restar-shop/db"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -71,7 +71,7 @@ func (shop *DB) CreateIndexFromBadgerDB(db *db.Store) {
 
 // Search searching items and get array of items if exist
 func (shop *DB) Search(qs string) []Item {
-	items := []Item{}
+	var items []Item
 
 	query := shop.db.Query("items").
 		Match("Name", qs)
@@ -113,8 +113,10 @@ func (shop *DB) Search(qs string) []Item {
 func InitSearch() *DB {
 	shop := DB{}
 	shop.db = reindexer.NewReindex("cproto://127.0.0.1:6534/testdb")
-	shop.db.OpenNamespace("items", reindexer.DefaultNamespaceOptions(), Item{})
-	shop.createIndex()
+	err := shop.db.OpenNamespace("items", reindexer.DefaultNamespaceOptions(), Item{})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return &shop
 }
