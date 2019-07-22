@@ -4,6 +4,7 @@ package search
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/restream/reindexer"
@@ -24,6 +25,13 @@ type Item struct {
 	SKU  string `json:"sku" reindex:"sku,fuzzytext"`   // add sortable index by 'year' field
 }
 
+// Item Define struct with reindex tags
+// type Item struct {
+// 	ID   string `json:"id" reindex:"id,,pk"`      // 'id' is primary key
+// 	Name string `json:"name" reindex:"name,text"` // add index by 'name' field
+// 	SKU  string `json:"sku" reindex:"sku,text"`   // add sortable index by 'year' field
+// }
+
 // Shop is shop
 type Shop struct {
 	Items []Item `json:"items"`
@@ -32,8 +40,16 @@ type Shop struct {
 
 func (shop *Shop) createIndex() {
 
-	file, _ := ioutil.ReadFile("../data/data.json")
-	json.Unmarshal(file, shop.Items)
+	file, err := ioutil.ReadFile("data/data.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = json.Unmarshal(file, &shop.Items)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(shop.Items)
 	// Generate dataset
 	for _, v := range shop.Items {
 		err := shop.db.Upsert("items", &Item{
@@ -54,10 +70,19 @@ func (shop *Shop) Search(qs string) []Item {
 	query := shop.db.Query("items").
 		Match("Name", qs)
 
-		// Execute the query and return an iterator
+	query2 := shop.db.Query("items").
+		Match("sku", qs)
+
+	query.Merge(query2)
+	// Execute the query and return an iterator
 	iterator := query.Exec()
 	// Iterator must be closed
 	defer iterator.Close()
+
+	// Check the error
+	if err := iterator.Error(); err != nil {
+		panic(err)
+	}
 
 	fmt.Println("Found", iterator.TotalCount(), "total documents, first", iterator.Count(), "documents:")
 
@@ -65,6 +90,7 @@ func (shop *Shop) Search(qs string) []Item {
 	for iterator.Next() {
 		// Get the next document and cast it to a pointer
 		elem := iterator.Object().(*Item)
+		fmt.Println(elem)
 		items = append(items, *elem)
 		// fmt.Println(*elem)
 	}
