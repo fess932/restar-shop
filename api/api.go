@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"../db"
-	"../search"
+	"restar-shop/db"
+	"restar-shop/search"
 
 	"github.com/go-chi/chi"
 	jsoniter "github.com/json-iterator/go"

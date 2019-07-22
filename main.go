@@ -1,19 +1,17 @@
 package main
 
 import (
-	"./api"
-	"./db"
-	"./search"
+	"restar-shop/db"
 )
 
 func main() {
 	storeDB := db.InitDB()
 	defer storeDB.DB.Close()
 
-	searchDB := search.InitSearch()
+	// searchDB := search.InitSearch()
 
-	searchDB.CreateIndexFromBadgerDB(storeDB)
-	// store.DownloadProducts(storeDB)
-	// store.ReadAllProducts()
-	api.Listen(storeDB, searchDB)
+	// searchDB.CreateIndexFromBadgerDB(storeDB)
+	//storeDB.DownloadProducts()
+	storeDB.ReadAllProducts()
+	// api.Listen(storeDB, searchDB)
 }
