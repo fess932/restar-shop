@@ -5,7 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	s "../search"
+	"../db"
+	"../search"
 
 	"github.com/go-chi/chi"
 	jsoniter "github.com/json-iterator/go"
@@ -17,9 +18,8 @@ var JSON = jsoniter.ConfigCompatibleWithStandardLibrary
 const localhost = "localhost:8080"
 
 // Listen открываем порт на сервере
-func Listen() {
+func Listen(storeDB *db.Store, searchDB *search.DB) {
 	r := chi.NewRouter()
-	search := s.InitSearch()
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("root"))
@@ -31,7 +31,7 @@ func Listen() {
 	r.Get("/search/{searchString}", func(w http.ResponseWriter, r *http.Request) {
 		searchString := chi.URLParam(r, "searchString")
 
-		items := search.Search(searchString)
+		items := searchDB.Search(searchString)
 
 		itemsMarshal, _ := JSON.Marshal(items)
 

@@ -1,14 +1,19 @@
 package main
 
 import (
+	"./api"
 	"./db"
+	"./search"
 )
 
 func main() {
-	store := db.InitDB()
-	defer store.DB.Close()
+	storeDB := db.InitDB()
+	defer storeDB.DB.Close()
 
-	// store.DownloadProducts()
-	store.ReadAllProducts()
-	// api.Listen()
+	searchDB := search.InitSearch()
+
+	searchDB.CreateIndexFromBadgerDB(storeDB)
+	// store.DownloadProducts(storeDB)
+	// store.ReadAllProducts()
+	api.Listen(storeDB, searchDB)
 }

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"../db"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/restream/reindexer"
 
@@ -20,9 +21,9 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 // Item Define struct with reindex tags
 type Item struct {
-	ID   string `json:"id" reindex:"id,,pk"`           // 'id' is primary key
-	Name string `json:"name" reindex:"name,fuzzytext"` // add index by 'name' field
-	SKU  string `json:"sku" reindex:"sku,fuzzytext"`   // add sortable index by 'year' field
+	ID   string `json:"id" reindex:"id,,pk"`                   // 'id' is primary key
+	Name string `json:"Наименование" reindex:"name,fuzzytext"` // add index by 'name' field
+	SKU  string `json:"sku" reindex:"sku,fuzzytext"`           // add sortable index by 'year' field
 }
 
 // Item Define struct with reindex tags
@@ -32,13 +33,13 @@ type Item struct {
 // 	SKU  string `json:"sku" reindex:"sku,text"`   // add sortable index by 'year' field
 // }
 
-// Shop is shop
-type Shop struct {
+// DB is search db
+type DB struct {
 	Items []Item `json:"items"`
 	db    *reindexer.Reindexer
 }
 
-func (shop *Shop) createIndex() {
+func (shop *DB) createIndex() {
 
 	file, err := ioutil.ReadFile("data/data.json")
 	if err != nil {
@@ -63,8 +64,13 @@ func (shop *Shop) createIndex() {
 	}
 }
 
+// CreateIndexFromBadgerDB create index from budger db
+func (shop *DB) CreateIndexFromBadgerDB(db *db.Store) {
+
+}
+
 // Search searching items and get array of items if exist
-func (shop *Shop) Search(qs string) []Item {
+func (shop *DB) Search(qs string) []Item {
 	items := []Item{}
 
 	query := shop.db.Query("items").
@@ -104,8 +110,8 @@ func (shop *Shop) Search(qs string) []Item {
 }
 
 // InitSearch get instance of search
-func InitSearch() *Shop {
-	shop := Shop{}
+func InitSearch() *DB {
+	shop := DB{}
 	shop.db = reindexer.NewReindex("cproto://127.0.0.1:6534/testdb")
 	shop.db.OpenNamespace("items", reindexer.DefaultNamespaceOptions(), Item{})
 	shop.createIndex()

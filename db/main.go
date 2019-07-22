@@ -12,14 +12,14 @@ type Store struct {
 }
 
 // InitDB initialize db
-func InitDB() Store {
+func InitDB() *Store {
 	var store Store
 	db, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 	store.DB = db
 	if err != nil {
 		log.Fatal(err)
 	}
-	return store
+	return &store
 }
 
 // DownloadProducts get products from json or anythig
