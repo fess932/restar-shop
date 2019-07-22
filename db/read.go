@@ -29,6 +29,7 @@ func (s *Store) ReadAllProducts() {
 
 		return nil
 	})
+
 	if err != nil {
 		log.Fatal(err)
 	}

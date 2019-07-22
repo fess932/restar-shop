@@ -28,7 +28,8 @@ type Product struct {
 func returnProducts() []Product {
 	var products []Product
 
-	file, err := ioutil.ReadFile("data/nomenklatura.json")
+	// file, err := ioutil.ReadFile("data/nomenklatura.json")
+	file, err := ioutil.ReadFile("data/dataFULL.json")
 	if err != nil {
 		log.Fatal(err)
 	}
