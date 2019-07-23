@@ -20,11 +20,11 @@ import (
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 // Item Define struct with reindex tags
-type Item struct {
-	ID   string `json:"id" reindex:"id,,pk"`                   // 'id' is primary key
-	Name string `json:"Наименование" reindex:"name,fuzzytext"` // add index by 'name' field
-	SKU  string `json:"sku" reindex:"sku,fuzzytext"`           // add sortable index by 'year' field
-}
+//type Item struct {
+//	ID   string `json:"id" reindex:"id,,pk"`                   // 'id' is primary key
+//	Name string `json:"Наименование" reindex:"name,fuzzytext"` // add index by 'name' field
+//	SKU  string `json:"sku" reindex:"sku,fuzzytext"`           // add sortable index by 'year' field
+//}
 
 // Item Define struct with reindex tags
 // type Item struct {
@@ -32,6 +32,12 @@ type Item struct {
 // 	Name string `json:"name" reindex:"name,text"` // add index by 'name' field
 // 	SKU  string `json:"sku" reindex:"sku,text"`   // add sortable index by 'year' field
 // }
+
+type Item struct {
+	GUID string `json:"GUID" reindex:"guid,,pk"`       // 'id' is primary key
+	Name string `json:"Name" reindex:"name,fuzzytext"` // add index by 'name' field
+	SKU  string `json:"SKU" reindex:"sku,fuzzytext"`   // add sortable index by 'year' field
+}
 
 // DB is search db
 type DB struct {
@@ -54,7 +60,7 @@ func (shop *DB) createIndex() {
 	// Generate dataset
 	for _, v := range shop.Items {
 		err := shop.db.Upsert("items", &Item{
-			ID:   v.ID,
+			GUID: v.GUID,
 			Name: v.Name,
 			SKU:  v.SKU,
 		})
@@ -66,6 +72,30 @@ func (shop *DB) createIndex() {
 
 // CreateIndexFromBadgerDB create index from budger db
 func (shop *DB) CreateIndexFromBadgerDB(db *db.Store) {
+	fullData := db.ReadAllProducts()
+	// TODO WATI?? :1} ???
+	for i, v := range fullData {
+		var tItem Item
+		err := json.Unmarshal(v, &tItem)
+
+		if err != nil {
+			println(i)
+			println(string(v))
+			log.Fatal(err)
+		}
+
+		err = shop.db.Upsert("items", &Item{
+			GUID: tItem.GUID,
+			Name: tItem.Name,
+			SKU:  tItem.SKU,
+		})
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	fmt.Println(`lengh of slice strings`, len(fullData))
 
 }
 

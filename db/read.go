@@ -8,7 +8,7 @@ import (
 )
 
 // ReadAllProducts чтение всех продуктов из базы данных и показ их
-func (s *Store) ReadAllProducts() {
+func (s *Store) ReadAllProducts() [][]byte {
 	var kv [][]byte
 
 	err := s.DB.View(func(txn *badger.Txn) error {
@@ -18,8 +18,13 @@ func (s *Store) ReadAllProducts() {
 
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			item := it.Item()
-			//k := item.Key()
+			k := item.Key()
+
 			err := item.Value(func(v []byte) error {
+
+				if string(k) == "products01b6ac76-4d63-11e5-949b-08606ed666b8" {
+					fmt.Println(string(v))
+				}
 				kv = append(kv, v)
 				return nil
 			})
@@ -34,4 +39,5 @@ func (s *Store) ReadAllProducts() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return kv
 }
