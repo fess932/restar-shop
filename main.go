@@ -2,7 +2,6 @@ package main
 
 import (
 	"restar-shop/db"
-	"restar-shop/search"
 )
 
 func main() {
@@ -14,8 +13,8 @@ func main() {
 	//storeDB.DownloadProducts()
 
 	// init search indexer for shop
-	searchDB := search.InitSearch()
-	searchDB.CreateIndexFromBadgerDB(storeDB)
+	// searchDB := search.InitSearch()
+	// searchDB.CreateIndexFromBadgerDB(storeDB)
 
 	//storeDB.ReadAllProducts()
 	//api.Listen(storeDB, searchDB)
