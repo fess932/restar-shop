@@ -33,6 +33,7 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 // 	SKU  string `json:"sku" reindex:"sku,text"`   // add sortable index by 'year' field
 // }
 
+// Item is item
 type Item struct {
 	GUID string `json:"GUID" reindex:"guid,,pk"`       // 'id' is primary key
 	Name string `json:"Name" reindex:"name,fuzzytext"` // add index by 'name' field

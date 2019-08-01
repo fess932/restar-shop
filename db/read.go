@@ -35,9 +35,11 @@ func (s *Store) ReadAllProducts() [][]byte {
 
 		return nil
 	})
+
 	fmt.Println(len(kv))
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return kv
 }
