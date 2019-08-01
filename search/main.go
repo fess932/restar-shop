@@ -35,9 +35,9 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 // Item is item
 type Item struct {
-	GUID string `json:"GUID" reindex:"guid,,pk"`       // 'id' is primary key
-	Name string `json:"Name" reindex:"name,fuzzytext"` // add index by 'name' field
-	SKU  string `json:"SKU" reindex:"sku,fuzzytext"`   // add sortable index by 'year' field
+	GUID string `json:"GUID" reindex:"guid,,pk"`               // 'id' is primary key
+	Name string `json:"Наименование" reindex:"name,fuzzytext"` // add index by 'name' field
+	SKU  string `json:"Артикул" reindex:"sku,fuzzytext"`       // add sortable index by 'year' field
 }
 
 // DB is search db
@@ -72,17 +72,18 @@ func (shop *DB) createIndex() {
 }
 
 // CreateIndexFromBadgerDB create index from budger db
-func (shop *DB) CreateIndexFromBadgerDB(db *db.Store) {
+func (shop *DB) CreateIndexFromBadgerDB(db *db.Store) (err error) {
 	fullData := db.ReadAllProducts()
 	// TODO WATI?? :1} ???
 	for i, v := range fullData {
+		println(string(v))
 		var tItem Item
 		err := json.Unmarshal(v, &tItem)
 
 		if err != nil {
 			println(i)
 			println(string(v))
-			log.Fatal(err)
+			return err
 		}
 
 		err = shop.db.Upsert("items", &Item{
@@ -92,12 +93,12 @@ func (shop *DB) CreateIndexFromBadgerDB(db *db.Store) {
 		})
 
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	fmt.Println(`lengh of slice strings`, len(fullData))
-
+	return nil
 }
 
 // Search searching items and get array of items if exist
