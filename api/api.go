@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"restar-shop/db"
 	"restar-shop/search"
@@ -30,8 +31,9 @@ func Listen(storeDB *db.Store, searchDB *search.DB) {
 
 	r.Get("/search/{searchString}", func(w http.ResponseWriter, r *http.Request) {
 		searchString := chi.URLParam(r, "searchString")
+		qs := normalizeQuery(searchString)
 
-		items := searchDB.Search(searchString)
+		items := searchDB.Search(qs)
 
 		itemsMarshal, _ := JSON.Marshal(items)
 
@@ -64,4 +66,11 @@ func scancode() {
 		}
 	}
 
+}
+
+func normalizeQuery(s string) (qs string) {
+	s = strings.ToUpper(s)
+	s = Replacer(s)
+	qs = s
+	return
 }

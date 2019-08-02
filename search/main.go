@@ -26,19 +26,19 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 //	SKU  string `json:"sku" reindex:"sku,fuzzytext"`           // add sortable index by 'year' field
 //}
 
-// Item Define struct with reindex tags
-// type Item struct {
-// 	ID   string `json:"id" reindex:"id,,pk"`      // 'id' is primary key
-// 	Name string `json:"name" reindex:"name,text"` // add index by 'name' field
-// 	SKU  string `json:"sku" reindex:"sku,text"`   // add sortable index by 'year' field
-// }
-
-// Item is item
+//Item Define struct with reindex tags
 type Item struct {
-	GUID string `json:"GUID" reindex:"guid,,pk"`               // 'id' is primary key
-	Name string `json:"Наименование" reindex:"name,fuzzytext"` // add index by 'name' field
-	SKU  string `json:"Артикул" reindex:"sku,fuzzytext"`       // add sortable index by 'year' field
+	GUID string `json:"GUID" reindex:"guid,,pk"`          // 'id' is primary key
+	Name string `json:"Наименование" reindex:"name,text"` // add index by 'name' field
+	SKU  string `json:"Артикул" reindex:"sku,text"`       // add sortable index by 'year' field
 }
+
+//// Item is item
+//type Item struct {
+//	GUID string `json:"GUID" reindex:"GUID,,pk"`               // 'id' is primary key
+//	Name string `json:"Наименование" reindex:"Наименование,fuzzytext"` // add index by 'name' field
+//	SKU  string `json:"Артикул" reindex:"Артикул,fuzzytext"`       // add sortable index by 'year' field
+//}
 
 // DB is search db
 type DB struct {
@@ -76,7 +76,7 @@ func (shop *DB) CreateIndexFromBadgerDB(db *db.Store) (err error) {
 	fullData := db.ReadAllProducts()
 	// TODO WATI?? :1} ???
 	for i, v := range fullData {
-		println(string(v))
+		//println(string(v))
 		var tItem Item
 		err := json.Unmarshal(v, &tItem)
 
