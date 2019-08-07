@@ -8,8 +8,11 @@ import (
 
 	"restar-shop/db"
 	"restar-shop/search"
+	"restar-shop/utilits"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
+
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -21,6 +24,17 @@ const localhost = "localhost:8080"
 // Listen открываем порт на сервере
 func Listen(storeDB *db.Store, searchDB *search.DB) {
 	r := chi.NewRouter()
+	cors := cors.New(cors.Options{
+		// AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
+		AllowedOrigins: []string{"*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	})
+	r.Use(cors.Handler)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("root"))
@@ -39,7 +53,7 @@ func Listen(storeDB *db.Store, searchDB *search.DB) {
 
 		w.Write(itemsMarshal)
 
-		fmt.Println(searchString)
+		fmt.Println(qs)
 	})
 
 	go http.ListenAndServe(localhost, r)
@@ -70,7 +84,7 @@ func scancode() {
 
 func normalizeQuery(s string) (qs string) {
 	s = strings.ToUpper(s)
-	s = Replacer(s)
+	s = utilits.Replacer(s)
 	qs = s
 	return
 }

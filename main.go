@@ -17,7 +17,7 @@ func main() {
 
 	// init search indexer for shop
 	searchDB := search.InitSearch()
-	searchDB.CreateIndexFromBadgerDB(storeDB)
+	//searchDB.CreateIndexFromBadgerDB(storeDB)
 
 	//storeDB.ReadAllProducts()
 	api.Listen(storeDB, searchDB)

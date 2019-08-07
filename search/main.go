@@ -144,7 +144,8 @@ func (shop *DB) Search(qs string) []Item {
 // InitSearch get instance of search
 func InitSearch() *DB {
 	shop := DB{}
-	shop.db = reindexer.NewReindex("cproto://127.0.0.1:6534/testdb")
+	//shop.db = reindexer.NewReindex("cproto://restar26.ga:6534/testdb")
+	shop.db = reindexer.NewReindex("cproto://192.168.1.32:6534/testdb")
 	err := shop.db.OpenNamespace("items", reindexer.DefaultNamespaceOptions(), Item{})
 	if err != nil {
 		log.Fatal(err)

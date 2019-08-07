@@ -3,6 +3,7 @@ package db
 import (
 	"io/ioutil"
 	"log"
+	"restar-shop/utilits"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -37,6 +38,10 @@ func returnProducts() []Product {
 	err = json.Unmarshal(file, &products)
 	if err != nil {
 		log.Fatal(err)
+	}
+	for i, v := range products {
+		products[i].Name = utilits.Replacer(v.Name)
+		products[i].SKU = utilits.Replacer(v.SKU)
 	}
 
 	return products
